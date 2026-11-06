@@ -1,0 +1,10 @@
+{
+  "name": "Remix Remix Ayadati Halan - Clinic Management SaaS",
+  "description": "Multi-tenant medical clinic management portal with doctor onboarding, reception desk, patient booking, queue management, and specialist directory.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

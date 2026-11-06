@@ -1,0 +1,1538 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  User, 
+  Users, 
+  Phone, 
+  Calendar, 
+  Clock, 
+  MapPin, 
+  Lock, 
+  Unlock, 
+  Star, 
+  FileText, 
+  Activity, 
+  ChevronDown, 
+  ChevronUp, 
+  LogOut, 
+  Info, 
+  CheckCircle2, 
+  CheckCircle, 
+  XCircle, 
+  CreditCard, 
+  Settings, 
+  MessageCircle, 
+  MessageSquare, 
+  Smartphone, 
+  Stethoscope, 
+  DollarSign, 
+  Briefcase, 
+  Key, 
+  FilePlus, 
+  Send, 
+  Menu, 
+  X, 
+  Search, 
+  FileSpreadsheet, 
+  Globe,
+  HeartPulse,
+  Droplet,
+  Heart,
+  Moon,
+  Mail,
+  ArrowRight,
+  Shield,
+  Monitor,
+  ArrowLeft,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Building2,
+  Copy,
+  Plus,
+  Sparkles,
+  Share2,
+  Layers,
+  Image as ImageIcon,
+  Check
+} from 'lucide-react';
+
+// ==========================================
+// 0. INITIAL SAAS TENANTS & STRUCTURE
+// ==========================================
+const SAAS_LOGO_URL = "https://i.postimg.cc/Y0Tt8dd3/d032f239-a99b-42a9-be01-c97f1f6cdd70.jpg";
+
+const INITIAL_SAAS_TENANTS = [
+  {
+    id: 'dr-wright',
+    slug: 'dr-wright',
+    clinicName: 'CareClinic Internal Medicine',
+    doctorName: 'Dr. Alexander Wright',
+    specialty: 'Internal Medicine',
+    tagline: 'Excellence in Medical Care, Tailored for You.',
+    bio: 'Chief Medical Officer with over 15 years of experience in internal medicine, dedicated to providing holistic and preventative care.',
+    qualifications: [
+      'MD, Harvard Medical School',
+      'Board Certified in Internal Medicine',
+      'Fellow of the American College of Physicians'
+    ],
+    rating: '5.0 / 5.0',
+    reviewScore: '4.9/5',
+    consultationFee: 500,
+    address: '123 Health Avenue, Medical District, NY 10001',
+    phone: '+1 (555) 123-4567 | Emergency: 911',
+    secretaryPhone: '+1 (555) 987-6543',
+    email: 'contact@careclinic.com',
+    portraitText: 'Dr.+Alexander+Wright',
+    paymentMethods: ['Cash', 'Vodafone Cash', 'Credit Card'],
+    clinicLocations: [
+      { id: 1, name: 'Main Clinic (Maadi)', days: 'Mon, Wed, Thu', hours: '09:00 AM - 02:00 PM' },
+      { id: 2, name: 'Branch (Zayed)', days: 'Tue, Sat', hours: '04:00 PM - 09:00 PM' }
+    ],
+    links: {
+      facebook: 'facebook.com/drwrightclinic',
+      whatsapp: '01000000001',
+      telegram: 't.me/drwrightclinic'
+    },
+    reviews: [
+      '"Dr. Wright is incredibly attentive and takes the time to explain everything clearly. Highly recommend!"',
+      '"The best clinic experience I\'ve had. Professional, clean, and compassionate care."'
+    ],
+    tips: [
+      'Drink at least 8 glasses of water daily to maintain optimal hydration and energy levels.',
+      'Incorporate 30 minutes of moderate exercise into your daily routine to support heart health.',
+      'Ensure 7-8 hours of quality sleep to boost immune function and cognitive performance.'
+    ]
+  },
+  {
+    id: 'dr-youssef',
+    slug: 'dr-youssef',
+    clinicName: 'Cairo Heart & Vascular Center',
+    doctorName: 'Dr. Youssef Ibrahim',
+    specialty: 'Cardiology',
+    tagline: 'Advanced Cardiac Care With Compassion.',
+    bio: 'Consultant Cardiologist with 18+ years specializing in interventional cardiology, preventative heart care, and echocardiography.',
+    qualifications: [
+      'MD & PhD in Cardiovascular Medicine, Cairo University',
+      'Fellow of the European Society of Cardiology (FESC)',
+      'Consultant of Interventional Cardiology'
+    ],
+    rating: '5.0 / 5.0',
+    reviewScore: '5.0/5',
+    consultationFee: 750,
+    address: '45 Corniche El Nil, Maadi, Cairo',
+    phone: '+20 100 123 4567 | Hotline: 19011',
+    secretaryPhone: '+20 100 999 8888',
+    email: 'info@cairoheartclinic.com',
+    portraitText: 'Dr.+Youssef+Ibrahim',
+    paymentMethods: ['Cash', 'Vodafone Cash'],
+    clinicLocations: [
+      { id: 1, name: 'Maadi Cardiac Center', days: 'Sun, Tue, Thu', hours: '10:00 AM - 03:00 PM' },
+      { id: 2, name: 'Sheikh Zayed Medical Hub', days: 'Mon, Wed', hours: '05:00 PM - 09:30 PM' }
+    ],
+    links: {
+      facebook: 'facebook.com/dryoussefcardio',
+      whatsapp: '01001234567',
+      telegram: 't.me/dryoussefclinic'
+    },
+    reviews: [
+      '"Dr. Youssef saved my father\'s life with an early diagnosis. Extremely thorough and kind."',
+      '"Very organized queue system and accurate appointment times at the Maadi branch."'
+    ],
+    tips: [
+      'Monitor your blood pressure weekly and reduce daily sodium intake for optimal arterial health.',
+      'A brisk 30-minute walk five times a week reduces cardiovascular risk by over 35%.',
+      'Avoid smoking and secondhand smoke to protect your coronary arteries.'
+    ]
+  },
+  {
+    id: 'dr-laila',
+    slug: 'dr-laila',
+    clinicName: 'Nour Kids & Family Clinic',
+    doctorName: 'Dr. Laila Mansour',
+    specialty: 'Pediatrics',
+    tagline: 'Gentle, Expert Healthcare for Your Little Ones.',
+    bio: 'Dedicated pediatrician focused on child growth, immunizations, pediatric nutrition, and newborn care in a stress-free environment.',
+    qualifications: [
+      'MD in Pediatrics, Ain Shams University',
+      'Member of the Royal College of Paediatrics (MRCPCH)',
+      'Certified Pediatric Nutrition Specialist'
+    ],
+    rating: '4.9 / 5.0',
+    reviewScore: '4.9/5',
+    consultationFee: 450,
+    address: '88 El-Merghany St, Heliopolis, Cairo',
+    phone: '+20 112 987 6543 | Emergency: 123',
+    secretaryPhone: '+20 112 333 4444',
+    email: 'care@nourkidsclinic.com',
+    portraitText: 'Dr.+Laila+Mansour',
+    paymentMethods: ['Cash', 'InstaPay', 'Vodafone Cash'],
+    clinicLocations: [
+      { id: 1, name: 'Heliopolis Main Clinic', days: 'Sat, Mon, Wed', hours: '11:00 AM - 04:00 PM' },
+      { id: 2, name: 'New Cairo Fifth Settlement', days: 'Sun, Tue, Thu', hours: '04:00 PM - 08:00 PM' }
+    ],
+    links: {
+      facebook: 'facebook.com/drlailapediatrics',
+      whatsapp: '01129876543',
+      telegram: 't.me/nourkidsclinic'
+    },
+    reviews: [
+      '"My kids actually love visiting Dr. Laila! She is so patient and reassuring with parents."',
+      '"The digital turn tracker lets us wait comfortably until our turn approaches."'
+    ],
+    tips: [
+      'Keep your child\'s vaccination schedule up to date to build strong lifelong immunity.',
+      'Limit screen time before bedtime to help children achieve deep, restorative growth sleep.',
+      'Include fresh fruits and iron-rich vegetables in every school lunchbox.'
+    ]
+  }
+];
+
+const AVAILABLE_SPECIALTIES = [
+  'Internal Medicine',
+  'Cardiology',
+  'Pediatrics',
+  'Dermatology',
+  'Orthopedics',
+  'Ophthalmology',
+  'Dentistry',
+  'Neurology'
+];
+
+// ==========================================
+// 1. SASS AUTHENTICATION & ONBOARDING MODAL
+// ("عيادتي حالاً" - Doctor First, then Receptionist, then Patients)
+// ==========================================
+const SaasAuthModal = ({ isOpen, onClose, onRegisterDoctor, onRegisterReceptionist, onSelectPatientView }) => {
+  const [tab, setTab] = useState('doctor'); // 'doctor' | 'receptionist' | 'patient'
+  const [successMsg, setSuccessMsg] = useState(null);
+
+  // 1. Doctor Signup Form State (Made First)
+  const [docForm, setDocForm] = useState({
+    doctorName: '',
+    specialty: 'Internal Medicine',
+    clinicAddress: '',
+    clinicPhone: '',
+    secretaryPhone: '',
+    qualifications: '',
+    consultationFee: 500,
+    portraitUrl: ''
+  });
+
+  // 2. Receptionist Signup Form State
+  const [recForm, setRecForm] = useState({
+    secretaryName: '',
+    doctorName: '',
+    clinicPhone: '',
+    additionalQualifications: '',
+    consultationFee: 500,
+    paymentMethods: 'Cash, Vodafone Cash'
+  });
+
+  if (!isOpen) return null;
+
+  const handleDoctorSubmit = (e) => {
+    e.preventDefault();
+    const slug = docForm.doctorName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const newTenant = {
+      id: slug || `doc-${Date.now()}`,
+      slug: slug || `doc-${Date.now()}`,
+      clinicName: `${docForm.doctorName}'s Clinic`,
+      doctorName: docForm.doctorName,
+      specialty: docForm.specialty,
+      tagline: `Professional ${docForm.specialty} Care by ${docForm.doctorName}`,
+      bio: `Experienced specialist in ${docForm.specialty} committed to advanced clinical treatments and compassionate care.`,
+      qualifications: docForm.qualifications ? docForm.qualifications.split(',').map(s => s.trim()) : ['MD Specialist', 'Board Certified'],
+      rating: '5.0 / 5.0',
+      reviewScore: '5.0/5',
+      consultationFee: Number(docForm.consultationFee) || 500,
+      address: docForm.clinicAddress || 'Main Medical Center, Cairo',
+      phone: docForm.clinicPhone || '+20 100 000 0000',
+      secretaryPhone: docForm.secretaryPhone || '+20 100 111 2222',
+      email: `${slug}@careclinic.com`,
+      portraitText: encodeURIComponent(docForm.doctorName),
+      paymentMethods: ['Cash', 'Vodafone Cash'],
+      clinicLocations: [
+        { id: 1, name: `${docForm.specialty} Main Branch`, days: 'Sun, Tue, Thu', hours: '10:00 AM - 04:00 PM' }
+      ],
+      links: { facebook: 'facebook.com/clinic', whatsapp: docForm.clinicPhone, telegram: 't.me/clinic' },
+      reviews: ['"Outstanding clinic organization and precise doctor consultation."'],
+      tips: ['Maintain regular checkups and follow prescribed dosages carefully.']
+    };
+
+    onRegisterDoctor(newTenant);
+    setSuccessMsg(`Doctor profile for ${docForm.doctorName} registered successfully! Clinic SaaS instance active.`);
+    setTimeout(() => {
+      setSuccessMsg(null);
+      onClose();
+    }, 2000);
+  };
+
+  const handleReceptionistSubmit = (e) => {
+    e.preventDefault();
+    setSuccessMsg(`Secretary account linked to ${recForm.doctorName} successfully! Opening reception desk.`);
+    setTimeout(() => {
+      setSuccessMsg(null);
+      onRegisterReceptionist();
+      onClose();
+    }, 1800);
+  };
+
+  return (
+    <div className="fixed inset-0 z-[120] bg-[#001d2d]/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-gray-200 my-8">
+        
+        {/* Header with Logo */}
+        <div className="bg-[#002F49] text-white p-6 text-center relative">
+          <button onClick={onClose} className="absolute top-4 right-4 text-white/70 hover:text-white p-2">
+            <X size={24} />
+          </button>
+          
+          <div className="flex justify-center mb-3">
+            <div className="w-16 h-16 rounded-2xl bg-white p-2 shadow-lg flex items-center justify-center overflow-hidden">
+              <img src={SAAS_LOGO_URL} alt="عيادتي حالاً Logo" className="w-full h-full object-contain" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold">عيادتي حالاً — SASS Portal</h2>
+          <p className="text-white/70 text-xs mt-1">Multi-Tenant Medical Clinic Engine & Doctor Management</p>
+        </div>
+
+        {/* Success Banner */}
+        {successMsg && (
+          <div className="bg-emerald-500 text-white p-4 text-center text-sm font-semibold flex items-center justify-center gap-2 animate-pulse">
+            <Check size={18} /> {successMsg}
+          </div>
+        )}
+
+        {/* Role Tab Switcher (1. Doctor made first, 2. Receptionist, 3. Patient) */}
+        <div className="grid grid-cols-3 bg-gray-100 p-1.5 gap-1 border-b border-gray-200 text-center text-xs font-bold">
+          <button
+            onClick={() => setTab('doctor')}
+            className={`py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+              tab === 'doctor' ? 'bg-[#002F49] text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            <Stethoscope size={15} /> 1. Doctor (أنت طبيب)
+          </button>
+          <button
+            onClick={() => setTab('receptionist')}
+            className={`py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+              tab === 'receptionist' ? 'bg-[#CD0000] text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            <Users size={15} /> 2. Receptionist (سكرتير)
+          </button>
+          <button
+            onClick={() => setTab('patient')}
+            className={`py-3 rounded-xl transition-all flex items-center justify-center gap-1.5 ${
+              tab === 'patient' ? 'bg-[#15679D] text-white shadow-md' : 'text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            <User size={15} /> 3. Patient (مريض)
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-6 max-h-[60vh] overflow-y-auto">
+          
+          {/* 1. DOCTOR SIGN UP (Made First) */}
+          {tab === 'doctor' && (
+            <form onSubmit={handleDoctorSubmit} className="space-y-4">
+              <div className="bg-blue-50 border border-blue-100 p-3 rounded-xl text-xs text-[#002F49]">
+                💡 <strong>Doctor Onboarding:</strong> Register your medical specialty and clinic details to instantly spin up your dedicated web app instance.
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Doctor Full Name (اسم الطبيب) *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., د. أحمد الشريف"
+                    value={docForm.doctorName}
+                    onChange={e => setDocForm({...docForm, doctorName: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Specialty (التخصص) *</label>
+                  <select
+                    value={docForm.specialty}
+                    onChange={e => setDocForm({...docForm, specialty: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm bg-white"
+                  >
+                    {AVAILABLE_SPECIALTIES.map(sp => (
+                      <option key={sp} value={sp}>{sp}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Clinic Address (عنوان العيادة) *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., 12 شارع التحرير، الدقي"
+                    value={docForm.clinicAddress}
+                    onChange={e => setDocForm({...docForm, clinicAddress: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Clinic Phone (رقم التليفون للعيادة) *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="e.g., 01012345678"
+                    value={docForm.clinicPhone}
+                    onChange={e => setDocForm({...docForm, clinicPhone: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Secretary Phone (رقم تليفون السكرتير)</label>
+                  <input
+                    type="tel"
+                    placeholder="e.g., 01198765432"
+                    value={docForm.secretaryPhone}
+                    onChange={e => setDocForm({...docForm, secretaryPhone: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Consultation Fee (قيمة الكشف - EGP)</label>
+                  <input
+                    type="number"
+                    value={docForm.consultationFee}
+                    onChange={e => setDocForm({...docForm, consultationFee: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Credentials & Qualifications (مؤهلات الاعتماد)</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., دكتوراه الكبد والجهاز الهضمي، جامعة قصر العيني، استشاري باطنة"
+                    value={docForm.qualifications}
+                    onChange={e => setDocForm({...docForm, qualifications: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-[#002F49] hover:bg-[#004266] text-white rounded-xl font-bold text-sm shadow-lg transition-all mt-4"
+              >
+                Create Doctor Clinic App (تسجيل العيادة)
+              </button>
+            </form>
+          )}
+
+          {/* 2. RECEPTIONIST SIGN UP ("For those to be around") */}
+          {tab === 'receptionist' && (
+            <form onSubmit={handleReceptionistSubmit} className="space-y-4">
+              <div className="bg-red-50 border border-red-100 p-3 rounded-xl text-xs text-[#CD0000] flex items-center gap-3">
+                <ImageIcon size={28} className="shrink-0" />
+                <span><strong>Reception Desk Setup:</strong> Link your secretary account to a specific doctor and configure clinic payment options.</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Secretary Name (اسم السكرتير/ة)</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., مريم أحمد"
+                    value={recForm.secretaryName}
+                    onChange={e => setRecForm({...recForm, secretaryName: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Affiliated Doctor (سكرتير لدى دكتور) *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g., د. أحمد الشريف"
+                    value={recForm.doctorName}
+                    onChange={e => setRecForm({...recForm, doctorName: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Clinic Phone (رقم تلفون العيادة)</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="01000000000"
+                    value={recForm.clinicPhone}
+                    onChange={e => setRecForm({...recForm, clinicPhone: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Consultation Fee (قيمة الكشف)</label>
+                  <input
+                    type="number"
+                    value={recForm.consultationFee}
+                    onChange={e => setRecForm({...recForm, consultationFee: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Available Payment Methods (وسائل الدفع المتاحة)</label>
+                  <input
+                    type="text"
+                    placeholder="Cash, Vodafone Cash, InstaPay"
+                    value={recForm.paymentMethods}
+                    onChange={e => setRecForm({...recForm, paymentMethods: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Additional Doctor Qualifications (مؤهلات إضافية)</label>
+                  <input
+                    type="text"
+                    placeholder="Fellowship of London"
+                    value={recForm.additionalQualifications}
+                    onChange={e => setRecForm({...recForm, additionalQualifications: e.target.value})}
+                    className="w-full p-2.5 border rounded-lg text-sm"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-[#CD0000] hover:bg-[#a30000] text-white rounded-xl font-bold text-sm shadow-lg transition-all mt-4"
+              >
+                Access Reception Desk Portal
+              </button>
+            </form>
+          )}
+
+          {/* 3. PATIENTS SIGN UP (+4 Specialty & Doctor Discovery) */}
+          {tab === 'patient' && (
+            <div className="space-y-6 text-center py-4">
+              <div className="w-20 h-20 bg-blue-50 text-[#15679D] rounded-full flex items-center justify-center mx-auto mb-2 shadow-inner">
+                <Users size={36} />
+              </div>
+              <h3 className="text-xl font-bold text-[#002F49]">Patient Discovery & Booking</h3>
+              <p className="text-gray-600 text-sm max-w-md mx-auto">
+                Patients can browse medical specialties, inspect available doctors, view clinic locations and schedules, and book instantly.
+              </p>
+
+              <button
+                onClick={() => {
+                  onClose();
+                  onSelectPatientView();
+                }}
+                className="px-8 py-3.5 bg-[#15679D] hover:bg-[#115582] text-white rounded-xl font-bold text-sm shadow-lg transition-all inline-flex items-center gap-2"
+              >
+                Browse Specialties & Doctors <ArrowRight size={16} />
+              </button>
+            </div>
+          )}
+
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// 2. GLOBAL LANDING PAGE PORTAL
+// ==========================================
+const LandingPortal = ({ onSelectPortal, tenant, onOpenSaasModal }) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [loginModalRole, setLoginModalRole] = useState(null);
+
+  // Fix: Use useEffect for handling the modal timeout and portal navigation safely
+  useEffect(() => {
+    if (!loginModalRole) return;
+    const timer = setTimeout(() => {
+      onSelectPortal(loginModalRole.toLowerCase());
+      setLoginModalRole(null);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [loginModalRole, onSelectPortal]);
+
+  const handleLoginClick = (role) => {
+    setLoginModalRole(role);
+  };
+
+  return (
+    <div className="font-sans antialiased text-[#002F49] bg-[#FFFFFF] selection:bg-[#002F49] selection:text-[#FFFFFF] min-h-screen">
+      <style>{`
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #FFFFFF; }
+        ::-webkit-scrollbar-thumb { background: #002F49; border-radius: 4px; }
+      `}</style>
+
+      {/* Navigation Bar */}
+      <nav className="fixed w-full bg-[#FFFFFF] shadow-md z-50 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            {/* Logo */}
+            <div 
+              className="flex-shrink-0 flex items-center gap-3 cursor-pointer" 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
+              <div className="w-12 h-12 rounded-2xl bg-white p-1.5 shadow border border-gray-100 flex items-center justify-center overflow-hidden">
+                <img src={SAAS_LOGO_URL} alt="Logo" className="w-full h-full object-contain" />
+              </div>
+              <div>
+                <span className="font-bold text-xl sm:text-2xl tracking-tight text-[#002F49] block leading-none">{tenant.clinicName}</span>
+                <span className="text-xs text-[#004266] font-medium">عيادتي حالاً • {tenant.doctorName} • {tenant.specialty}</span>
+              </div>
+            </div>
+            
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-6">
+              <a href="#doctor-profile" className="text-[#002F49] hover:text-[#004266] font-medium transition-colors">Doctor Profile</a>
+              <a href="#clinic-info" className="text-[#002F49] hover:text-[#004266] font-medium transition-colors">Information</a>
+              <button
+                onClick={onOpenSaasModal}
+                className="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full bg-gradient-to-r from-[#002F49] to-[#15679D] text-white shadow hover:opacity-95 transition-all"
+              >
+                <Layers size={14} />
+                Sign Up / Sign In (SASS)
+              </button>
+              <a href="#login-hub" className="bg-[#002F49] text-[#FFFFFF] px-6 py-2.5 rounded-full font-semibold hover:bg-[#004266] transition-all shadow-lg">
+                Login Hub
+              </a>
+            </div>
+            
+            {/* Mobile Menu Button */}
+            <div className="md:hidden flex items-center">
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-[#002F49] p-2">
+                {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-[#FFFFFF] border-t border-gray-100 px-4 py-4 space-y-3 text-center shadow-lg">
+            <a href="#doctor-profile" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-[#002F49] font-medium">Doctor Profile</a>
+            <a href="#clinic-info" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-[#002F49] font-medium">Information</a>
+            <button
+              onClick={() => { setMobileMenuOpen(false); onOpenSaasModal(); }}
+              className="w-full py-2.5 bg-[#002F49] text-white rounded-lg font-bold text-xs"
+            >
+              Sign Up / Sign In (SASS)
+            </button>
+            <a href="#login-hub" onClick={() => setMobileMenuOpen(false)} className="block py-2.5 bg-gray-100 text-[#002F49] rounded-lg font-medium">Login Hub</a>
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Section */}
+      <section id="hero" className="pt-32 pb-20 lg:pt-48 lg:pb-32 bg-[#002F49] text-[#FFFFFF] overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="z-10 text-center lg:text-left">
+              <span className="inline-block py-1 px-3 rounded-full bg-[#FFFFFF]/10 text-sm font-semibold tracking-wider mb-6 uppercase">
+                {tenant.specialty} • {tenant.clinicName}
+              </span>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                {tenant.tagline}
+              </h1>
+              <p className="text-lg sm:text-xl text-[#FFFFFF]/80 mb-8 max-w-2xl mx-auto lg:mx-0">
+                Welcome to <strong className="text-white">{tenant.doctorName}</strong>'s clinic portal powered by <em>عيادتي حالاً</em>. Book appointments, track your turn live, and access clinical prescriptions securely.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <a href="#login-hub" className="bg-[#FFFFFF] text-[#002F49] px-8 py-3 rounded-full font-bold text-lg hover:bg-gray-100 transition-all shadow-xl">
+                  Access Portal
+                </a>
+                <button onClick={onOpenSaasModal} className="border-2 border-[#FFFFFF] text-[#FFFFFF] px-8 py-3 rounded-full font-bold text-lg hover:bg-[#FFFFFF]/10 transition-all">
+                  Register New Doctor / Secretary
+                </button>
+              </div>
+            </div>
+            
+            <div className="relative flex justify-center lg:justify-end">
+              <div className="absolute inset-0 bg-[#FFFFFF]/10 rounded-full blur-3xl transform scale-90"></div>
+              <img 
+                src={`https://placehold.co/600x700/FFFFFF/002F49?text=${tenant.portraitText}`} 
+                alt={tenant.doctorName} 
+                className="relative z-10 w-full max-w-md rounded-2xl shadow-2xl border-4 border-[#FFFFFF]/20 object-cover aspect-[4/5]" 
+              />
+              <div className="absolute -bottom-6 -left-6 lg:bottom-10 lg:-left-10 bg-[#FFFFFF] text-[#002F49] p-4 rounded-xl shadow-2xl z-20 flex items-center gap-4 animate-bounce" style={{ animationDuration: '3s' }}>
+                <div className="bg-[#002F49]/10 p-3 rounded-full">
+                  <Star className="text-[#002F49] fill-[#002F49]" size={22} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-gray-500">Consultation Fee</p>
+                  <p className="font-bold text-lg">{tenant.consultationFee} EGP</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Doctor Profile Section */}
+      <section id="doctor-profile" className="py-24 bg-[#FFFFFF]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#002F49] mb-4">Meet Your Specialist</h2>
+            <div className="w-24 h-1 bg-[#002F49] mx-auto rounded-full"></div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <div className="w-14 h-14 bg-[#002F49] rounded-xl flex items-center justify-center text-[#FFFFFF] mb-6 shadow-md">
+                <Stethoscope size={28} />
+              </div>
+              <h3 className="text-2xl font-bold text-[#002F49] mb-4">{tenant.doctorName}</h3>
+              <p className="text-gray-600 mb-6 leading-relaxed">{tenant.bio}</p>
+              <ul className="space-y-3">
+                {tenant.qualifications.map((qual, idx) => (
+                  <li key={idx} className="flex items-center gap-3 text-sm font-medium text-[#002F49]">
+                    <CheckCircle2 className="text-green-500 shrink-0" size={18} /> {qual}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-white border border-gray-100 p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <div className="w-14 h-14 bg-[#002F49] rounded-xl flex items-center justify-center text-[#FFFFFF] mb-6 shadow-md">
+                <MessageCircle size={28} />
+              </div>
+              <h3 className="text-2xl font-bold text-[#002F49] mb-4">Patient Reviews</h3>
+              <div className="flex items-center gap-1.5 mb-4 text-yellow-400">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={20} className="fill-yellow-400 text-yellow-400" />
+                ))}
+                <span className="text-[#002F49] font-bold ml-2 text-lg">{tenant.reviewScore}</span>
+              </div>
+              <div className="space-y-4">
+                {tenant.reviews.map((rev, idx) => (
+                  <div key={idx} className="bg-gray-50 p-4 rounded-lg italic text-gray-600 text-sm border-l-4 border-[#002F49]">
+                    {rev}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-[#002F49] text-[#FFFFFF] p-8 rounded-2xl shadow-xl flex flex-col">
+              <div className="w-14 h-14 bg-[#FFFFFF] text-[#002F49] rounded-xl flex items-center justify-center mb-6 shadow-md">
+                <FileText size={28} />
+              </div>
+              <h3 className="text-2xl font-bold mb-4">Doctor's Daily Tips</h3>
+              <div className="space-y-4 flex-grow">
+                <div className="flex items-start gap-3">
+                  <Droplet className="mt-1 text-blue-300 shrink-0" size={18} />
+                  <p className="text-sm text-[#FFFFFF]/90">{tenant.tips[0]}</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Heart className="mt-1 text-red-300 shrink-0" size={18} />
+                  <p className="text-sm text-[#FFFFFF]/90">{tenant.tips[1]}</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Moon className="mt-1 text-yellow-300 shrink-0" size={18} />
+                  <p className="text-sm text-[#FFFFFF]/90">{tenant.tips[2]}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Clinic Information Section */}
+      <section id="clinic-info" className="py-24 bg-[#002F49] text-[#FFFFFF] border-t border-[#FFFFFF]/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Clinic Information & Payment</h2>
+              <div className="w-16 h-1 bg-[#FFFFFF] rounded-full mb-8"></div>
+              <p className="text-[#FFFFFF]/80 mb-10 text-lg">
+                Secretary Contact: <strong className="text-white">{tenant.secretaryPhone}</strong> | Payment Methods accepted: <span className="text-blue-200 font-semibold">{tenant.paymentMethods?.join(', ')}</span>.
+              </p>
+              
+              <div className="space-y-6">
+                <div className="flex items-center gap-5 p-4 bg-[#FFFFFF]/5 rounded-xl border border-[#FFFFFF]/10">
+                  <div className="w-12 h-12 rounded-full bg-[#FFFFFF] text-[#002F49] flex items-center justify-center shrink-0">
+                    <MapPin size={22} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg">Primary Address</h4>
+                    <p className="text-[#FFFFFF]/70">{tenant.address}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-5 p-4 bg-[#FFFFFF]/5 rounded-xl border border-[#FFFFFF]/10">
+                  <div className="w-12 h-12 rounded-full bg-[#FFFFFF] text-[#002F49] flex items-center justify-center shrink-0">
+                    <Phone size={22} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg">Contact Number</h4>
+                    <p className="text-[#FFFFFF]/70">{tenant.phone}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative h-[400px] bg-[#FFFFFF]/5 rounded-3xl border border-[#FFFFFF]/20 overflow-hidden shadow-2xl flex items-center justify-center">
+              <img src="https://placehold.co/800x800/004266/FFFFFF?text=Map+Location" alt="Map" className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay" />
+              <div className="relative z-10 text-center">
+                <div className="w-20 h-20 bg-[#FFFFFF] rounded-full flex items-center justify-center text-[#002F49] mx-auto mb-4 shadow-xl animate-bounce">
+                  <MapPin size={32} />
+                </div>
+                <h3 className="text-2xl font-bold">Find Us on Map</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Login Hub Section */}
+      <section id="login-hub" className="py-24 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-[#002F49] mb-4">Central Login Hub</h2>
+            <div className="w-24 h-1 bg-[#002F49] mx-auto rounded-full mb-6"></div>
+            <p className="text-gray-600 max-w-2xl mx-auto">Select your portal entry point below to securely access your personalized dashboard.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 max-w-5xl mx-auto">
+            <button onClick={() => handleLoginClick('Patient')} className="group relative bg-[#FFFFFF] border rounded-3xl p-10 text-center shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center">
+              <div className="w-20 h-20 bg-[#15679D]/10 rounded-full flex items-center justify-center text-[#15679D] mb-6 group-hover:bg-[#15679D] group-hover:text-[#FFFFFF] transition-colors">
+                <User size={32} />
+              </div>
+              <h3 className="text-2xl font-bold text-[#002F49] mb-3">Patient Portal</h3>
+              <p className="text-gray-500 text-sm mb-8">Book appointments, view records, and message your doctor securely.</p>
+              <div className="mt-auto inline-flex items-center gap-2 text-[#15679D] font-bold">
+                Login as Patient <ArrowRight size={18} />
+              </div>
+            </button>
+
+            <button onClick={() => handleLoginClick('Doctor')} className="group relative bg-[#002F49] rounded-3xl p-10 text-center shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col items-center">
+              <div className="w-20 h-20 bg-[#FFFFFF]/10 rounded-full flex items-center justify-center text-[#FFFFFF] mb-6 group-hover:bg-[#F40E31] transition-colors">
+                <Stethoscope size={32} />
+              </div>
+              <h3 className="text-2xl font-bold text-[#FFFFFF] mb-3">Doctor Portal</h3>
+              <p className="text-[#FFFFFF]/70 text-sm mb-8">Manage patient files, schedules, and clinical notes in one place.</p>
+              <div className="mt-auto inline-flex items-center gap-2 text-[#63B3F0] font-bold">
+                Login as Doctor <ArrowRight size={18} />
+              </div>
+            </button>
+
+            <button onClick={() => handleLoginClick('Reception')} className="group relative bg-[#FFFFFF] border rounded-3xl p-10 text-center shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col items-center">
+              <div className="w-20 h-20 bg-[#CD0000]/10 rounded-full flex items-center justify-center text-[#CD0000] mb-6 group-hover:bg-[#CD0000] group-hover:text-[#FFFFFF] transition-colors">
+                <Monitor size={32} />
+              </div>
+              <h3 className="text-2xl font-bold text-[#002F49] mb-3">Reception Desk</h3>
+              <p className="text-gray-500 text-sm mb-8">Handle scheduling, billing, and front desk patient management.</p>
+              <div className="mt-auto inline-flex items-center gap-2 text-[#CD0000] font-bold">
+                Login as Reception <ArrowRight size={18} />
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#001d2d] text-[#FFFFFF]/60 py-8 text-center">
+        <div className="max-w-7xl mx-auto px-4">
+          <p className="text-sm">&copy; {new Date().getFullYear()} عيادتي حالاً — {tenant.clinicName}. All rights reserved.</p>
+        </div>
+      </footer>
+
+      {loginModalRole && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#002F49]/80 backdrop-blur-sm">
+          <div className="bg-[#FFFFFF] text-[#002F49] p-8 rounded-2xl shadow-2xl max-w-sm w-full mx-4 text-center">
+            <Shield className="text-[#002F49] mx-auto mb-4" size={36} />
+            <h3 className="text-2xl font-bold mb-2">Authentication</h3>
+            <p className="text-gray-600 mb-6">Redirecting to the <span className="font-bold">{loginModalRole}</span> portal...</p>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#002F49] mx-auto"></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ==========================================
+// 3. PATIENT SPECIALTY & DOCTOR DISCOVERY VIEW
+// (Step 3: اختيار التخصص -> عرض الدكاترة -> اختيار دكتور -> نافذة الحجز ومواعيد وأماكن العيادات)
+// ==========================================
+const PatientDirectoryView = ({ tenants, onSelectTenant, onBackToHome }) => {
+  const [selectedSpecialty, setSelectedSpecialty] = useState('All');
+  const [activeDoctorModal, setActiveDoctorModal] = useState(null);
+  const [patientBookingForm, setPatientBookingForm] = useState({ name: '', phone: '', date: '2026-11-15' });
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+
+  const filteredTenants = selectedSpecialty === 'All' 
+    ? tenants 
+    : tenants.filter(t => t.specialty.toLowerCase() === selectedSpecialty.toLowerCase());
+
+  const handleBookAppointment = (e) => {
+    e.preventDefault();
+    setBookingConfirmed(true);
+    setTimeout(() => {
+      setBookingConfirmed(false);
+      setActiveDoctorModal(null);
+    }, 2500);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-10 px-4 font-sans">
+      <div className="max-w-6xl mx-auto">
+        
+        {/* Top Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button onClick={onBackToHome} className="inline-flex items-center gap-2 text-sm font-semibold text-[#002F49] hover:text-[#15679D]">
+            <ArrowLeft size={18} /> Back to Home
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-xl bg-white p-1 shadow flex items-center justify-center">
+              <img src={SAAS_LOGO_URL} alt="Logo" className="w-full h-full object-contain" />
+            </div>
+            <h1 className="text-xl font-bold text-[#002F49]">عيادتي حالاً — Patient Discovery</h1>
+          </div>
+        </div>
+
+        {/* 1. Specialty Selector (اختيار التخصص) */}
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
+          <h2 className="text-lg font-bold text-[#002F49] mb-4 flex items-center gap-2">
+            <Search size={20} className="text-[#15679D]" /> اختر التخصص الطبي (Select Specialty)
+          </h2>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedSpecialty('All')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                selectedSpecialty === 'All' ? 'bg-[#002F49] text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All Specialties (الكل)
+            </button>
+            {AVAILABLE_SPECIALTIES.map(sp => (
+              <button
+                key={sp}
+                onClick={() => setSelectedSpecialty(sp)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                  selectedSpecialty === sp ? 'bg-[#15679D] text-white shadow' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {sp}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 2. Display Doctors in Specialty (يعرض الدكاترة اللي موجودين فيه) */}
+        <div className="mb-6">
+          <h3 className="text-xl font-bold text-[#002F49] mb-4">
+            Available Doctors ({filteredTenants.length})
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredTenants.map(doc => (
+              <div key={doc.id} className="bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden flex flex-col justify-between hover:shadow-xl transition-all">
+                <div className="p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <img 
+                      src={`https://placehold.co/100x100/002F49/FFFFFF?text=${doc.doctorName.replace('Dr. ', '')}`} 
+                      alt={doc.doctorName} 
+                      className="w-16 h-16 rounded-2xl object-cover border-2 border-[#15679D]" 
+                    />
+                    <div>
+                      <h4 className="font-bold text-lg text-[#002F49]">{doc.doctorName}</h4>
+                      <span className="text-xs bg-[#15679D]/10 text-[#15679D] font-semibold px-2.5 py-0.5 rounded-full">
+                        {doc.specialty}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-600 mb-4 line-clamp-2">{doc.bio}</p>
+                  <div className="space-y-1.5 text-xs text-gray-500">
+                    <p className="flex items-center gap-1.5"><MapPin size={14} className="text-[#15679D]" /> {doc.address}</p>
+                    <p className="flex items-center gap-1.5"><DollarSign size={14} className="text-[#15679D]" /> Consultation Fee: <strong className="text-gray-800">{doc.consultationFee} EGP</strong></p>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-2">
+                  <button
+                    onClick={() => {
+                      onSelectTenant(doc);
+                    }}
+                    className="w-1/2 py-2.5 bg-gray-200 hover:bg-gray-300 text-[#002F49] rounded-xl text-xs font-bold transition-colors"
+                  >
+                    Visit Clinic App
+                  </button>
+                  <button
+                    onClick={() => setActiveDoctorModal(doc)}
+                    className="w-1/2 py-2.5 bg-[#15679D] hover:bg-[#115582] text-white rounded-xl text-xs font-bold transition-colors shadow"
+                  >
+                    حجز موعد (Book)
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 3. Doctor Booking & Clinic Locations Modal (نافذة الحجز ومواعيد وأماكن العيادات) */}
+        {activeDoctorModal && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden">
+              <div className="bg-[#002F49] text-white p-6 flex justify-between items-center">
+                <div>
+                  <h3 className="font-bold text-xl">{activeDoctorModal.doctorName}</h3>
+                  <p className="text-xs text-blue-200">{activeDoctorModal.specialty} • {activeDoctorModal.clinicName}</p>
+                </div>
+                <button onClick={() => setActiveDoctorModal(null)} className="text-white/70 hover:text-white p-2">
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+                {bookingConfirmed ? (
+                  <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-2xl text-center space-y-3">
+                    <CheckCircle size={48} className="text-emerald-500 mx-auto" />
+                    <h4 className="font-bold text-emerald-800 text-lg">Appointment Booked Successfully!</h4>
+                    <p className="text-xs text-emerald-700">Your turn number has been issued. The clinic secretary will confirm via WhatsApp.</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Clinic Locations & Hours */}
+                    <div>
+                      <h4 className="font-bold text-sm text-[#002F49] mb-3 flex items-center gap-2">
+                        <MapPin size={16} className="text-[#15679D]" /> أماكن ومواعيد العيادات (Clinic Locations & Hours)
+                      </h4>
+                      <div className="space-y-2">
+                        {activeDoctorModal.clinicLocations.map(loc => (
+                          <div key={loc.id} className="bg-gray-50 border p-3 rounded-xl text-xs space-y-1">
+                            <p className="font-bold text-gray-800">{loc.name}</p>
+                            <p className="text-gray-600 flex items-center gap-1"><Calendar size={13} /> {loc.days} ({loc.hours})</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Booking Form */}
+                    <form onSubmit={handleBookAppointment} className="space-y-4 pt-4 border-t">
+                      <h4 className="font-bold text-sm text-[#002F49]">حجز موعد جديد (New Booking)</h4>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Patient Full Name (اسم المريض)</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g., محمود سعيد"
+                          value={patientBookingForm.name}
+                          onChange={e => setPatientBookingForm({...patientBookingForm, name: e.target.value})}
+                          className="w-full p-2.5 border rounded-lg text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Mobile Number (رقم المحمول)</label>
+                        <input
+                          type="tel"
+                          required
+                          placeholder="01000000000"
+                          value={patientBookingForm.phone}
+                          onChange={e => setPatientBookingForm({...patientBookingForm, phone: e.target.value})}
+                          className="w-full p-2.5 border rounded-lg text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-gray-700 mb-1">Preferred Date (تاريخ الحجز)</label>
+                        <input
+                          type="date"
+                          value={patientBookingForm.date}
+                          onChange={e => setPatientBookingForm({...patientBookingForm, date: e.target.value})}
+                          className="w-full p-2.5 border rounded-lg text-sm"
+                        />
+                      </div>
+                      <div className="p-3 bg-blue-50 rounded-xl text-xs flex justify-between items-center text-[#002F49]">
+                        <span>Consultation Fee:</span>
+                        <strong className="text-sm">{activeDoctorModal.consultationFee} EGP</strong>
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full py-3 bg-[#15679D] hover:bg-[#115582] text-white rounded-xl font-bold text-sm shadow-lg transition-all"
+                      >
+                        Confirm Booking & Get Turn Number
+                      </button>
+                    </form>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// 4. PATIENT PORTAL
+// ==========================================
+const PatientPortal = ({ onBackToHome, tenant }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [visitCompleted, setVisitCompleted] = useState(false);
+  const [expandedFaq, setExpandedFaq] = useState(null);
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [ratingSubmitted, setRatingSubmitted] = useState(false);
+
+  const colors = {
+    primaryText: 'text-[#3B3B3B]',
+    primaryBg: 'bg-[#3B3B3B]',
+    accentText: 'text-[#15679D]',
+    accentBg: 'bg-[#15679D]',
+    accentBorder: 'border-[#15679D]',
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 font-sans">
+        <div className="max-w-md w-full mb-4">
+          <button onClick={onBackToHome} className="inline-flex items-center gap-2 text-sm font-medium text-[#3B3B3B] hover:text-[#15679D]">
+            <ArrowLeft size={16} /> Back to Home
+          </button>
+        </div>
+        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className={`${colors.accentBg} p-8 text-center text-white`}>
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <User size={32} className="text-white" />
+            </div>
+            <h1 className="text-2xl font-bold mb-1">Patient Portal</h1>
+            <p className="text-blue-100 text-xs font-medium">{tenant.clinicName} • {tenant.doctorName}</p>
+          </div>
+          <div className="p-8">
+            <form onSubmit={(e) => { e.preventDefault(); setIsLoggedIn(true); }} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-[#3B3B3B] mb-2">Patient ID / Number</label>
+                <input type="text" required defaultValue="P-1004" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#15679D] outline-none" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#3B3B3B] mb-2">Mobile Number</label>
+                <input type="tel" required defaultValue="01012345678" className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-[#15679D] outline-none" />
+              </div>
+              <button type="submit" className={`w-full py-3 ${colors.accentBg} text-white rounded-lg font-medium`}>
+                Access Portal
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans text-[#3B3B3B]">
+      <header className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+          <div className="flex items-center gap-3">
+            <Activity className={colors.accentText} size={24} />
+            <h1 className="text-xl font-bold text-[#15679D]">MedPortal</h1>
+          </div>
+          <button onClick={() => setIsLoggedIn(false)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700">
+            <LogOut size={16} /> Log Out
+          </button>
+        </div>
+      </header>
+
+      <div className="bg-white border-b">
+        <div className="max-w-5xl mx-auto px-4 flex space-x-6">
+          {['dashboard', 'post-consultation', 'support'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`py-4 px-1 border-b-2 font-medium text-sm capitalize ${activeTab === tab ? `${colors.accentBorder} ${colors.accentText}` : 'border-transparent text-gray-500'}`}
+            >
+              {tab.replace('-', ' ')}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <main className="max-w-5xl mx-auto px-4 py-8">
+        {activeTab === 'dashboard' && (
+          <div className="space-y-6">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex gap-4 items-start">
+              <CheckCircle2 className="text-emerald-500 shrink-0 mt-0.5" size={24} />
+              <div>
+                <h3 className="text-emerald-800 font-semibold mb-1">Arrival Instructions</h3>
+                <p className="text-emerald-700 text-sm">Please aim to arrive <strong>15 minutes early</strong> for your appointment.</p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-sm border">
+                <h3 className="text-sm font-medium text-gray-500 mb-4 uppercase">Your Turn Number</h3>
+                <div className="w-32 h-32 rounded-full border-4 border-[#15679D] flex items-center justify-center mb-2 shadow-inner">
+                  <span className="text-5xl font-bold text-[#15679D]">04</span>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">Currently serving: <span className="font-bold">02</span></p>
+              </div>
+
+              <div className="md:col-span-2 bg-white rounded-2xl p-6 shadow-sm border">
+                <h2 className="text-lg font-bold mb-6 text-[#15679D] flex items-center gap-2">
+                  <Calendar size={20} /> Upcoming Appointment ({tenant.doctorName})
+                </h2>
+                <div className="grid sm:grid-cols-2 gap-6 text-sm">
+                  <div><p className="text-gray-500">Date:</p><p className="font-semibold">Thursday, Nov 12, 2026</p></div>
+                  <div><p className="text-gray-500">Time:</p><p className="font-semibold">10:30 AM</p></div>
+                  <div><p className="text-gray-500">Location:</p><p className="font-semibold">{tenant.address}</p></div>
+                  <div><p className="text-gray-500">Fee:</p><p className="font-semibold">{tenant.consultationFee} EGP</p></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'post-consultation' && (
+          <div className="space-y-6">
+            <div className="bg-white p-4 rounded-xl border flex justify-between items-center">
+              <span className="text-sm font-medium">Demo: Toggle Visit Status</span>
+              <button onClick={() => setVisitCompleted(!visitCompleted)} className={`px-4 py-2 rounded-full text-sm font-medium ${visitCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                {visitCompleted ? 'Visit Completed' : 'Mark as Completed'}
+              </button>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border space-y-4">
+                <h3 className="font-bold text-[#15679D]">Medical Orders & Prescriptions</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="bg-gray-50 p-2.5 rounded border">CBC & Lipid Panel</li>
+                  <li className="bg-gray-50 p-2.5 rounded border">Chest X-Ray</li>
+                </ul>
+              </div>
+
+              <div className="relative bg-white p-6 rounded-2xl shadow-sm border flex flex-col">
+                <h3 className="font-bold text-[#15679D] mb-4">Ratings & Notes</h3>
+                <div className="flex gap-2 mb-4">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star 
+                      key={star} 
+                      size={24} 
+                      onClick={() => setSelectedRating(star)} 
+                      className={`cursor-pointer ${star <= selectedRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} 
+                    />
+                  ))}
+                </div>
+                <div className="bg-gray-50 p-3 rounded text-xs text-gray-600 mb-4 h-24">
+                  Patient presented with stable vitals. Prescribed standard course. Follow-up in 2 weeks.
+                </div>
+                <button onClick={() => setRatingSubmitted(true)} className="w-full py-2 bg-[#15679D] text-white rounded-lg text-sm font-medium">
+                  {ratingSubmitted ? 'Submitted!' : 'Submit Rating'}
+                </button>
+
+                {!visitCompleted && (
+                  <div className="absolute inset-0 bg-white/70 backdrop-blur-[1px] rounded-2xl flex flex-col items-center justify-center">
+                    <Lock size={28} className="text-gray-400 mb-1" />
+                    <span className="text-xs font-bold text-gray-600">Locked Until Visit Completed</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'support' && (
+          <div className="max-w-xl mx-auto space-y-4">
+            <h2 className="text-2xl font-bold text-center mb-6">Frequently Asked Questions</h2>
+            {[{q: 'How to reschedule?', a: 'Contact secretary at ' + tenant.secretaryPhone}, {q: 'Where are lab results?', a: 'Visible in Post-Consultation tab.'}].map((f, i) => (
+              <div key={i} className="bg-white p-4 rounded-xl border shadow-sm">
+                <h4 className="font-bold text-sm mb-1">{f.q}</h4>
+                <p className="text-xs text-gray-600">{f.a}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+// ==========================================
+// 5. RECEPTION DESK PORTAL
+// ==========================================
+const INITIAL_RECEPTION_PATIENTS = [
+  { id: 'P001', name: 'Ahmed Mahmoud', phone: '01012345678', address: 'Maadi, Cairo', time: '09:00 AM', status: 'waiting', turn: 1 },
+  { id: 'P002', name: 'Fatma Ali', phone: '01198765432', address: 'Zamalek, Cairo', time: '09:30 AM', status: 'waiting', turn: 2 },
+  { id: 'P003', name: 'Omar Hassan', phone: '01234567890', address: 'Mohandeseen, Giza', time: '10:00 AM', status: 'waiting', turn: 3 }
+];
+
+const ReceptionPortal = ({ onBackToHome, tenant }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentView, setCurrentView] = useState('queue');
+  const [patients, setPatients] = useState(INITIAL_RECEPTION_PATIENTS);
+  const [toastMsg, setToastMsg] = useState(null);
+
+  const showToast = (msg) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3000);
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md border-t-4 border-[#CD0000]">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-[#CD0000] text-white rounded-full flex items-center justify-center mx-auto mb-3">
+              <Users size={30} />
+            </div>
+            <h1 className="text-xl font-bold text-gray-800">Receptionist Desk Portal</h1>
+            <p className="text-[#CD0000] text-xs mt-1">{tenant.clinicName}</p>
+          </div>
+          <form onSubmit={(e) => { e.preventDefault(); setIsAuthenticated(true); }} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Username</label>
+              <input type="text" defaultValue="secretary" className="w-full p-2.5 border rounded-lg text-sm" required />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Password</label>
+              <input type="password" defaultValue="password" className="w-full p-2.5 border rounded-lg text-sm" required />
+            </div>
+            <button type="submit" className="w-full bg-[#CD0000] hover:bg-[#a30000] text-white font-bold py-3 rounded-lg text-sm">
+              Login to Reception
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex">
+      <div className="w-64 bg-white border-r flex flex-col hidden md:flex fixed h-full z-20">
+        <div className="p-6 bg-[#CD0000] text-white">
+          <h2 className="font-bold text-lg">Reception Desk</h2>
+          <p className="text-xs text-white/80">{tenant.doctorName}</p>
+        </div>
+        <nav className="flex-1 p-4 space-y-2">
+          {[
+            { id: 'queue', label: 'Queue & Turn Manager', icon: Calendar },
+            { id: 'payments', label: `Payments (${tenant.consultationFee} EGP)`, icon: CreditCard },
+          ].map(item => (
+            <button
+              key={item.id}
+              onClick={() => setCurrentView(item.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium ${currentView === item.id ? 'bg-red-50 text-[#CD0000]' : 'text-gray-600'}`}
+            >
+              <item.icon size={18} /> {item.label}
+            </button>
+          ))}
+        </nav>
+        <div className="p-4 border-t">
+          <button onClick={onBackToHome} className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
+            <ArrowLeft size={16} /> Main Website
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 md:ml-64 p-6">
+        <div className="max-w-4xl mx-auto space-y-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">Queue Management</h2>
+              <p className="text-xs text-gray-500">Secretary Hotline: {tenant.secretaryPhone}</p>
+            </div>
+            <button onClick={() => showToast("Called next patient successfully")} className="bg-[#CD0000] hover:bg-[#a30000] text-white px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-2 shadow">
+              <Phone size={16} /> Call Next Patient
+            </button>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border overflow-hidden p-6">
+            <h3 className="font-bold text-gray-800 mb-4">Waiting List ({patients.length})</h3>
+            <div className="space-y-3">
+              {patients.map(p => (
+                <div key={p.id} className="flex justify-between items-center p-3 bg-gray-50 border rounded-xl text-sm">
+                  <div className="flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-full bg-[#CD0000]/10 text-[#CD0000] font-bold flex items-center justify-center text-xs">{p.turn}</span>
+                    <div>
+                      <p className="font-bold text-gray-800">{p.name}</p>
+                      <p className="text-xs text-gray-500">{p.phone} • {p.time}</p>
+                    </div>
+                  </div>
+                  <button onClick={() => showToast(`Payment processed (${tenant.consultationFee} EGP)`)} className="px-3 py-1.5 bg-emerald-100 text-emerald-800 rounded-lg text-xs font-bold">
+                    Collect {tenant.consultationFee} EGP
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {toastMsg && (
+        <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-5 py-2.5 rounded-xl shadow-xl text-xs flex items-center gap-2 z-50">
+          <CheckCircle size={16} className="text-green-400" /> {toastMsg}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ==========================================
+// 6. DOCTOR PORTAL
+// ==========================================
+const DoctorPortal = ({ onBackToHome, tenant }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [notification, setNotification] = useState(null);
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border-t-4 border-[#F40E31]">
+          <div className="text-center mb-6">
+            <Stethoscope size={40} className="text-[#F40E31] mx-auto mb-2" />
+            <h1 className="text-xl font-bold text-gray-800">Doctor Portal — {tenant.doctorName}</h1>
+          </div>
+          <form onSubmit={(e) => { e.preventDefault(); setIsAuthenticated(true); }} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-700 mb-1">Doctor Sign Key</label>
+              <input type="password" defaultValue="KEY-2026" className="w-full p-2.5 border rounded-lg text-sm" required />
+            </div>
+            <button type="submit" className="w-full py-3 bg-[#F40E31] text-white rounded-lg font-bold text-sm">
+              Login to Doctor Dashboard
+            </button>
+            <button type="button" onClick={onBackToHome} className="w-full text-xs text-gray-500 hover:text-gray-800 pt-2">
+              Back to Website
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-bold text-gray-800">{tenant.doctorName}'s Dashboard</h1>
+            <p className="text-xs text-gray-500">{tenant.specialty} • {tenant.clinicName}</p>
+          </div>
+          <button onClick={() => setIsAuthenticated(false)} className="text-xs font-semibold text-red-600 hover:underline">
+            Logout
+          </button>
+        </div>
+
+        <div className="bg-white rounded-2xl p-6 shadow-sm border space-y-4">
+          <h3 className="font-bold text-gray-800">Clinical Actions & Electronic Invoices</h3>
+          <p className="text-xs text-gray-500">Manage required lab tests, scans, and Tax Authority compliant electronic invoices.</p>
+          <div className="p-4 bg-gray-50 rounded-xl border flex justify-between items-center text-xs">
+            <span>Consultation Fee set in SaaS: <strong>{tenant.consultationFee} EGP</strong></span>
+            <button onClick={() => setNotification("Electronic invoice synced successfully!")} className="px-4 py-2 bg-[#63B3F0] text-white font-bold rounded-lg">
+              Sync e-Invoice
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {notification && (
+        <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-5 py-2.5 rounded-xl text-xs z-50">
+          {notification}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ==========================================
+// 7. MASTER APP & ROUTING SWITCHER
+// ==========================================
+export default function App() {
+  const [activePortal, setActivePortal] = useState('landing'); // 'landing' | 'patient-directory' | 'patient' | 'reception' | 'doctor'
+  const [tenants, setTenants] = useState(INITIAL_SAAS_TENANTS);
+  const [activeTenantId, setActiveTenantId] = useState(INITIAL_SAAS_TENANTS[0].id);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const activeTenant = tenants.find(t => t.id === activeTenantId) || tenants[0];
+
+  return (
+    <div className="relative min-h-screen">
+      
+      {/* Floating SASS Onboarding & Switcher Widget ("عيادتي حالاً") */}
+      <div className="fixed bottom-4 left-4 z-[95] bg-[#001d2d]/95 text-white p-2 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-md flex items-center gap-2 text-xs">
+        <div className="w-8 h-8 rounded-xl bg-white p-1 flex items-center justify-center shrink-0">
+          <img src={SAAS_LOGO_URL} alt="Logo" className="w-full h-full object-contain" />
+        </div>
+        
+        <button
+          onClick={() => setIsAuthModalOpen(true)}
+          className="px-3.5 py-2 rounded-xl font-bold bg-[#F40E31] text-white shadow-md hover:bg-[#d00c28] transition-all flex items-center gap-1.5"
+        >
+          <Sparkles size={14} />
+          <span>Sign up / Sign in (SASS)</span>
+        </button>
+
+        <div className="h-5 w-px bg-white/20"></div>
+
+        <button
+          onClick={() => setActivePortal('landing')}
+          className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${activePortal === 'landing' ? 'bg-white text-[#002F49]' : 'text-white/70 hover:text-white'}`}
+        >
+          Home
+        </button>
+        <button
+          onClick={() => setActivePortal('patient-directory')}
+          className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${activePortal === 'patient-directory' ? 'bg-[#15679D] text-white' : 'text-white/70 hover:text-white'}`}
+        >
+          Patients (اختر تخصص)
+        </button>
+      </div>
+
+      {/* SaaS Auth & Onboarding Modal */}
+      <SaasAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onRegisterDoctor={(newDoc) => {
+          setTenants(prev => [newDoc, ...prev]);
+          setActiveTenantId(newDoc.id);
+          setActivePortal('landing');
+        }}
+        onRegisterReceptionist={() => {
+          setActivePortal('reception');
+        }}
+        onSelectPatientView={() => {
+          setActivePortal('patient-directory');
+        }}
+      />
+
+      {/* Portal Routing */}
+      {activePortal === 'landing' && (
+        <LandingPortal 
+          tenant={activeTenant}
+          onSelectPortal={(role) => setActivePortal(role)} 
+          onOpenSaasModal={() => setIsAuthModalOpen(true)}
+        />
+      )}
+      {activePortal === 'patient-directory' && (
+        <PatientDirectoryView
+          tenants={tenants}
+          onSelectTenant={(doc) => {
+            setActiveTenantId(doc.id);
+            setActivePortal('landing');
+          }}
+          onBackToHome={() => setActivePortal('landing')}
+        />
+      )}
+      {activePortal === 'patient' && (
+        <PatientPortal 
+          tenant={activeTenant}
+          onBackToHome={() => setActivePortal('landing')} 
+        />
+      )}
+      {activePortal === 'reception' && (
+        <ReceptionPortal 
+          tenant={activeTenant}
+          onBackToHome={() => setActivePortal('landing')} 
+        />
+      )}
+      {activePortal === 'doctor' && (
+        <DoctorPortal 
+          tenant={activeTenant}
+          onBackToHome={() => setActivePortal('landing')} 
+        />
+      )}
+
+    </div>
+  );
+}
