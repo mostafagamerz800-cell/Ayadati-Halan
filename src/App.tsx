@@ -2119,6 +2119,45 @@ export const WhatsAppPatientAlertsSection: React.FC<WhatsAppPatientAlertsSection
 
   const confirmedCount = SEEDED_TODAY_APPOINTMENTS.filter(p => patientStatuses[p.id] === 'confirmed').length;
 
+  // Real WhatsApp Cloud API direct dispatch
+  const [apiSendingId, setApiSendingId] = useState<string | null>(null);
+  const [apiFeedback, setApiFeedback] = useState<{ success: boolean; message: string } | null>(null);
+
+  const handleCloudApiSend = async (patient: TodayAppointment, messageText: string) => {
+    setApiSendingId(patient.id);
+    setApiFeedback(null);
+    try {
+      const res = await fetch('/api/send-whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: patient.phone,
+          message: messageText,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        updatePatientStatus(patient, 'confirmed', 'Cloud API (Meta)');
+        setApiFeedback({
+          success: true,
+          message: `تم إرسال الرسالة بنجاح عبر خادم WhatsApp Cloud API للمريض ${patient.name}! (معرّف الرسالة: ${data.messageId || 'Success'})`,
+        });
+      } else {
+        setApiFeedback({
+          success: false,
+          message: data.error || 'تعذر الإرسال عبر Cloud API. تأكد من إضافة WHATSAPP_ACCESS_TOKEN و WHATSAPP_PHONE_NUMBER_ID في متغيرات البيئة.',
+        });
+      }
+    } catch (err) {
+      setApiFeedback({
+        success: false,
+        message: err instanceof Error ? err.message : 'خطأ في الاتصال بالخادم',
+      });
+    } finally {
+      setApiSendingId(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* 10. WEEK DAY STRIP (شريط أيام الأسبوع للتنقل السريع بين الأيام) */}
@@ -2363,6 +2402,27 @@ export const WhatsAppPatientAlertsSection: React.FC<WhatsAppPatientAlertsSection
               </span>
             </div>
 
+            {/* Cloud API Feedback Banner */}
+            {apiFeedback && (
+              <div className={`p-4 rounded-xl border text-xs flex items-center justify-between gap-3 ${
+                apiFeedback.success
+                  ? 'bg-sky-50 border-sky-300 text-sky-900 font-semibold'
+                  : 'bg-amber-50 border-amber-200 text-amber-900 font-medium'
+              }`} dir="rtl">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2.5 h-2.5 rounded-full ${apiFeedback.success ? 'bg-sky-500' : 'bg-amber-500'}`} />
+                  <span>{apiFeedback.message}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setApiFeedback(null)}
+                  className="text-xs font-bold text-sky-700 hover:underline cursor-pointer"
+                >
+                  إغلاق
+                </button>
+              </div>
+            )}
+
             {/* List Rows */}
             <div className="divide-y divide-sky-100">
               {appointments.map((patient) => {
@@ -2459,6 +2519,22 @@ export const WhatsAppPatientAlertsSection: React.FC<WhatsAppPatientAlertsSection
                               <Send size={13} className="text-sky-600" />
                               <span>فتح بالقالب ({templateTypeLabels[activeTemplateKey].split(' ')[0]})</span>
                             </a>
+
+                            {/* Direct WhatsApp Cloud API Button */}
+                            <button
+                              type="button"
+                              disabled={apiSendingId === patient.id}
+                              onClick={() => handleCloudApiSend(patient, personalizedTemplateMsg)}
+                              className="px-3 py-2 bg-gradient-to-r from-sky-600 to-sky-700 hover:from-sky-700 hover:to-sky-800 text-white rounded-xl font-bold text-xs shadow-sm transition-all inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                              title="إرسال رسالة مباشرة للمريض عبر Meta WhatsApp Cloud API و Node.js backend"
+                            >
+                              {apiSendingId === patient.id ? (
+                                <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Sparkles size={13} className="text-sky-200" />
+                              )}
+                              <span>إرسال Cloud API</span>
+                            </button>
 
                             {/* Separate manual button: تأكيد الإرسال */}
                             <button
